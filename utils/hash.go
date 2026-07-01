@@ -30,9 +30,7 @@ func SHA512(data []byte) [64]byte {
 // SHA256Compress Raw SHA-256 compression fn for 64 byte data, returns 32 byte digest
 // Used in PRFs
 func SHA256Compress(data [64]byte) [32]byte {
-	// TODO: Complete this later
-	var out [32]byte
-	return out
+	return compress(data)
 }
 
 // BLAKE2b256 returns BLAKE2b-256 digest of data.
