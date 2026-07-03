@@ -3,5 +3,5 @@
 package zcrypto
 
 func Keygen() {
-	Expand()
+	panic("Not yet implemented!")
 }

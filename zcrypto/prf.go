@@ -1,14 +1,6 @@
 package zcrypto
 
-import (
-	"fmt"
-	"zed/utils"
-)
-
-func Expand() []byte {
-	fmt.Println("Hello", MerkleDepthOrchard)
-	return []byte{1, 2}
-}
+import "zed/utils"
 
 // -------------------------------------------------
 // Sprout PRFs
@@ -72,6 +64,52 @@ func PRFRho(phi [32]byte, i uint8, hSig [32]byte) [32]byte {
 // Sapling PRFs
 // -------------------------------------------------
 
+// PRFExpand derives Sapling/Orchard expanded key material
+func PRFExpand(sk [32]byte, t []byte) [64]byte {
+	data := make([]byte, 0, 32+len(t))
+	data = append(data, sk[:]...)
+	data = append(data, t...)
+
+	return utils.BLAKE2b512([]byte("Zcash_ExpandSeed"), data)
+}
+
+// PRFockSapling derives Sapling outgoing cipher key
+func PRFockSapling(ovk, cv, cmu, ephemeralKey [32]byte) [32]byte {
+	var data [128]byte
+	copy(data[0:32], ovk[:])
+	copy(data[32:64], cv[:])
+	copy(data[64:96], cmu[:])
+	copy(data[96:128], ephemeralKey[:])
+
+	return utils.BLAKE2b256([]byte("Zcash_Derive_ock"), data[:])
+}
+
+// PRFnfSapling derives Sapling note nullifier
+func PRFnfSapling(nk, rho [32]byte) [32]byte {
+	var data [64]byte
+	copy(data[0:32], nk[:])
+	copy(data[32:64], rho[:])
+
+	return utils.BLAKE2s256([]byte("Zcash_nf"), data[:])
+}
+
 // -------------------------------------------------
 // Orchard PRFs
 // -------------------------------------------------
+
+// PRFockOrchard derives Orchard outgoing cipher key
+func PRFockOrchard(ovk, cv, cmx, ephemeralKey [32]byte) [32]byte {
+	var data [128]byte
+
+	copy(data[0:32], ovk[:])
+	copy(data[32:64], cv[:])
+	copy(data[64:96], cmx[:])
+	copy(data[96:128], ephemeralKey[:])
+
+	return utils.BLAKE2b256([]byte("Zcash_Orchardock"), data[:])
+}
+
+// PRFnfOrchard derives Orchard note nullifier
+func PRFnfOrchard(nk, rho [32]byte) {
+	panic("PRFnfOrchard not yet implemented")
+}
